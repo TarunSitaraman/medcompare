@@ -1,0 +1,36 @@
+# Dependencies
+node_modules/
+
+# Next.js
+.next/
+out/
+
+# Environment — never commit secrets
+.env
+.env.local
+.env.*.local
+
+# Build artifacts
+tsconfig.tsbuildinfo
+
+# Data files — large CSVs and raw ingestion data
+data/
+!data/.gitkeep
+
+# Debug output
+data/debug-scrapers/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+
+# Playwright
+test-results/
+playwright-report/
+
+# Claude Code project files
+.claude/
