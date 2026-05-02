@@ -39,18 +39,19 @@ export async function scrape1mg(medicineName: string, strength?: string): Promis
     await page.goto(searchUrl, { waitUntil: 'networkidle', timeout: 25000 })
     await page.waitForTimeout(1500)
 
-    if (searchResult) {
-      const prices = searchResult.prices as Record<string, unknown> | null
+    const hit = searchResult as Record<string, unknown> | null
+    if (hit) {
+      const prices = hit.prices as Record<string, unknown> | null
       const price =
         parseRupees(prices?.discounted_price) ??
         parseRupees(prices?.mrp)
-      const slug = searchResult.url as string | undefined
+      const slug = hit.url as string | undefined
       return {
         pharmacy: '1mg',
         price,
         pricePerUnit: null,
         url: slug ? `https://www.1mg.com${slug}` : null,
-        inStock: (searchResult.available as boolean) !== false,
+        inStock: (hit.available as boolean) !== false,
         scrapedAt: new Date(),
       }
     }

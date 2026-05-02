@@ -131,19 +131,23 @@ export default async function ComparePage({ params, searchParams }: Props) {
           </div>
         ) : (
           <div className="space-y-3">
-            {prices
-              .filter(p => p.price !== null)
-              .map((price, i) => (
+            {(() => {
+              const withPrices = prices.filter(p => p.price !== null)
+              const maxPrice = Math.max(...withPrices.map(p => p.price ?? 0))
+              return withPrices.map((price, i) => (
                 <PriceCard
                   key={price.id}
+                  pharmacy={price.pharmacy}
                   pharmacyLabel={PHARMACY_LABELS[price.pharmacy] ?? price.pharmacy}
                   price={price.price}
                   url={price.url ? buildAffiliateUrl(price.pharmacy, price.url) : null}
                   inStock={price.in_stock}
                   scrapedAt={price.scraped_at}
                   isCheapest={i === 0}
+                  maxPrice={maxPrice}
                 />
-              ))}
+              ))
+            })()}
           </div>
         )}
       </section>
