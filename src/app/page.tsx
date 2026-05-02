@@ -73,7 +73,7 @@ export default function HomePage() {
         <div style={{ position: 'absolute', top: -80, right: -60, width: 400, height: 400, borderRadius: '50%', background: 'radial-gradient(circle, var(--accent-glow), transparent 65%)', pointerEvents: 'none' }} />
         <div style={{ position: 'absolute', bottom: -60, left: -40, width: 280, height: 280, borderRadius: '50%', background: 'radial-gradient(circle, var(--gold-glow), transparent 65%)', pointerEvents: 'none' }} />
 
-        <div style={{ maxWidth: 1024, margin: '0 auto', padding: '56px 20px 64px', display: 'flex', alignItems: 'center', gap: 48, position: 'relative' }}>
+        <div style={{ maxWidth: 1024, margin: '0 auto', padding: 'clamp(24px, 5vw, 56px) 20px clamp(28px, 5vw, 64px)', display: 'flex', alignItems: 'center', gap: 48, position: 'relative' }}>
           {/* Left: headline + search */}
           <div style={{ flex: 1, minWidth: 0 }}>
             {/* Badge */}
@@ -84,8 +84,8 @@ export default function HomePage() {
                 color: 'var(--accent-text)', fontSize: 11, fontWeight: 600,
                 borderRadius: 20, padding: '5px 11px',
               }}>
-                <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--accent)', animation: 'pulse-dot 2.2s ease infinite', display: 'block' }} />
-                Free · No signup · Prices updated daily
+                <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--accent)', animation: 'pulse-dot 2.2s ease infinite', display: 'inline-block', flexShrink: 0 }} />
+                Free · No signup · Updated daily
               </span>
             </div>
 
@@ -213,7 +213,7 @@ export default function HomePage() {
           </div>
 
           {/* Right: Savings illustration (desktop only) */}
-          <div className="hidden lg:block" style={{ flexShrink: 0, width: 280 }}>
+          <div className="show-lg" style={{ flexShrink: 0, width: 280 }}>
             <SavingsCard brandPrice={850} genericPrice={89} brandLabel="Brand (PharmEasy)" genericLabel="Generic (Jan Aushadhi)" eyebrow="EXAMPLE SAVINGS" />
           </div>
         </div>

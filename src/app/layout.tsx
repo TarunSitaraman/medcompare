@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import { Plus_Jakarta_Sans, Inter } from 'next/font/google'
 import './globals.css'
 import ThemeToggle from '@/components/ThemeToggle'
+import AppInit from '@/components/AppInit'
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -60,6 +61,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         `}} />
       </head>
       <body>
+        <AppInit />
         {/* App banner header */}
         <header style={{
           background: 'linear-gradient(135deg, oklch(32% 0.20 250) 0%, oklch(50% 0.18 232) 100%)',

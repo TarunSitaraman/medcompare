@@ -9,6 +9,7 @@ import {
   getNearestStores,
   calculateSavings,
 } from '@/lib/data/medicines'
+import { supabase } from '@/lib/supabase'
 import type { Medicine, Price, Generic, Store } from '@/lib/supabase'
 import PriceCard from '@/components/PriceCard'
 import GenericAlert from '@/components/GenericAlert'
@@ -63,6 +64,7 @@ function ComparePage() {
   const [stores, setStores] = useState<Store[]>([])
   const [loading, setLoading] = useState(true)
   const [notFound, setNotFound] = useState(false)
+  const [queued, setQueued] = useState(false)
 
   useEffect(() => {
     if (!slug) { setNotFound(true); setLoading(false); return }
@@ -83,6 +85,15 @@ function ComparePage() {
       setPrices(priceData)
       setGeneric(genericData)
       setStores(storeData)
+
+      // If no prices, add to scrape queue for next scraper run
+      if (priceData.length === 0) {
+        supabase.from('scrape_queue').upsert(
+          { medicine_id: med.id, slug: med.slug, status: 'pending' },
+          { onConflict: 'medicine_id', ignoreDuplicates: true }
+        ).then(r => { if (!r.error) setQueued(true) })
+      }
+
       setLoading(false)
     }).catch(() => { setNotFound(true); setLoading(false) })
   }, [slug, pincode])
@@ -165,8 +176,16 @@ function ComparePage() {
             Online pharmacy prices
           </h2>
           {withPrices.length === 0 ? (
-            <div className="glass-card" style={{ borderRadius: 18, padding: '32px 24px', textAlign: 'center' }}>
-              <p style={{ fontSize: 14, color: 'var(--text-secondary)' }}>No prices found yet for this medicine.</p>
+            <div className="glass-card" style={{ borderRadius: 18, padding: '24px 20px', textAlign: 'center' }}>
+              <div style={{ fontSize: 28, marginBottom: 10 }}>🕐</div>
+              <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 6 }}>
+                Prices not yet scraped
+              </p>
+              <p style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+                {queued
+                  ? 'Added to queue — prices will appear after the next daily update.'
+                  : 'This medicine hasn\'t been scraped yet. Check back tomorrow.'}
+              </p>
             </div>
           ) : (
             <div>
