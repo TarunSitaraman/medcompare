@@ -127,7 +127,7 @@ export default function HomePage() {
                       paddingLeft: 50, paddingRight: 126,
                       background: 'var(--bg-glass)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
                       border: '1.5px solid var(--glass-inner)',
-                      borderRadius: 18, fontSize: 15, color: 'var(--text-primary)',
+                      borderRadius: 22, fontSize: 15, color: 'var(--text-primary)',
                       transition: 'all 0.25s ease',
                     }}
                     onFocusCapture={e => { e.currentTarget.style.borderColor = 'var(--accent)'; e.currentTarget.style.boxShadow = '0 0 0 3px var(--accent-glow)' }}
@@ -140,7 +140,7 @@ export default function HomePage() {
                     position: 'absolute', right: 6, top: '50%', transform: 'translateY(-50%)',
                     height: 46, padding: '0 18px',
                     background: 'var(--grad-cta)', color: 'white',
-                    border: 'none', borderRadius: 14,
+                    border: 'none', borderRadius: 18,
                     fontSize: 14, fontWeight: 600, cursor: 'pointer',
                     boxShadow: '0 3px 14px var(--accent-glow)',
                     transition: 'transform 0.15s',
@@ -160,7 +160,7 @@ export default function HomePage() {
                   position: 'absolute', top: 'calc(100% + 6px)', left: 0, right: 0,
                   background: 'var(--bg-glass-strong)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)',
                   border: '1px solid var(--glass-inner)',
-                  borderRadius: 16, boxShadow: 'var(--sh-lg)', zIndex: 50, overflow: 'hidden',
+                  borderRadius: 20, boxShadow: 'var(--sh-lg)', zIndex: 50, overflow: 'hidden',
                 }}>
                   {suggestions.map((medicine, i) => (
                     <button key={medicine.id} onMouseDown={() => handleSelect(medicine)} style={{
@@ -178,14 +178,21 @@ export default function HomePage() {
                           {medicine.display_name}
                         </div>
                         <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                          {medicine.salt_name}{medicine.strength ? ` · ${medicine.strength}` : ''}{medicine.form ? ` · ${medicine.form}` : ''}
+                          {medicine.matched_brand ? `${medicine.clean_salt} · ` : ''}{medicine.strength ?? ''}{medicine.form ? ` · ${medicine.form}` : ''}
                         </div>
                       </div>
-                      {medicine.has_generic && (
-                        <span style={{ flexShrink: 0, fontSize: 10, fontWeight: 600, color: 'var(--accent-text)', background: 'var(--accent-surface)', border: '1px solid var(--accent-border)', borderRadius: 10, padding: '2px 7px', whiteSpace: 'nowrap' }}>
-                          Generic ✓
-                        </span>
-                      )}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+                        {medicine.min_price !== null && (
+                          <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--gold)', whiteSpace: 'nowrap' }}>
+                            From ₹{medicine.min_price}
+                          </span>
+                        )}
+                        {medicine.has_generic && (
+                          <span style={{ fontSize: 10, fontWeight: 600, color: 'var(--accent-text)', background: 'var(--accent-surface)', border: '1px solid var(--accent-border)', borderRadius: 10, padding: '2px 7px', whiteSpace: 'nowrap' }}>
+                            Generic ✓
+                          </span>
+                        )}
+                      </div>
                     </button>
                   ))}
                 </div>

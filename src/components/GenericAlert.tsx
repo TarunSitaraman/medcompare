@@ -57,7 +57,7 @@ interface VProps {
 function DefaultVariant({ name, genericPrice, brandPrice, savings, waUrl, onFindStore }: VProps) {
   return (
     <div style={{
-      margin: 16, borderRadius: 22,
+      margin: 16, borderRadius: 28,
       background: 'var(--bg-glass)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
       border: '1.5px solid var(--gold-border)',
       boxShadow: '0 4px 28px var(--gold-glow), var(--sh-md)',
@@ -94,7 +94,7 @@ function DefaultVariant({ name, genericPrice, brandPrice, savings, waUrl, onFind
 
       {/* Savings block */}
       {savings && (
-        <div style={{ margin: '0 16px 14px', background: 'var(--gold-surface)', border: '1px solid var(--gold-border)', borderRadius: 12, padding: '10px 14px' }}>
+        <div style={{ margin: '0 16px 14px', background: 'var(--gold-surface)', border: '1px solid var(--gold-border)', borderRadius: 16, padding: '10px 14px' }}>
           <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--gold-text)' }}>
             Save ₹{savings.amount.toFixed(0)} · {savings.percentage}% cheaper
           </div>
@@ -119,10 +119,10 @@ function DefaultVariant({ name, genericPrice, brandPrice, savings, waUrl, onFind
 
 function CompactVariant({ name, genericPrice, brandPrice, savings, waUrl, onFindStore }: VProps) {
   return (
-    <div className="glass-card" style={{ borderRadius: 20, padding: 16, margin: 16 }}>
+    <div className="glass-card" style={{ borderRadius: 26, padding: 16, margin: 16 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
         <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)' }}>{name}</span>
-        <span style={{ fontSize: 10, fontWeight: 600, background: 'var(--gold-surface)', border: '1px solid var(--gold-border)', color: 'var(--gold-text)', borderRadius: 10, padding: '2px 7px' }}>Jan Aushadhi</span>
+        <span style={{ fontSize: 10, fontWeight: 600, background: 'var(--gold-surface)', border: '1px solid var(--gold-border)', color: 'var(--gold-text)', borderRadius: 12, padding: '2px 7px' }}>Jan Aushadhi</span>
       </div>
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 8 }}>
         <span style={{ fontFamily: 'var(--font-heading)', fontSize: '2.1rem', fontWeight: 800, color: 'var(--gold)', fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.03em' }}>₹{genericPrice}</span>
@@ -130,7 +130,7 @@ function CompactVariant({ name, genericPrice, brandPrice, savings, waUrl, onFind
         {brandPrice && <span style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--text-secondary)', textDecoration: 'line-through', fontVariantNumeric: 'tabular-nums' }}>₹{brandPrice.toFixed(0)}</span>}
       </div>
       {savings && <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--gold-text)', marginBottom: 12 }}>Save {savings.percentage}% · ₹{savings.amount.toFixed(0)} less</div>}
-      <button onClick={onFindStore} style={{ width: '100%', height: 44, background: 'var(--grad-cta)', color: 'white', border: 'none', borderRadius: 13, fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>
+      <button onClick={onFindStore} style={{ width: '100%', height: 44, background: 'var(--grad-cta)', color: 'white', border: 'none', borderRadius: 16, fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>
         Find nearest Jan Aushadhi store →
       </button>
     </div>
@@ -140,7 +140,7 @@ function CompactVariant({ name, genericPrice, brandPrice, savings, waUrl, onFind
 function BoldVariant({ name, genericPrice, brandPrice, savings, waUrl, onFindStore }: VProps) {
   return (
     <div style={{
-      borderRadius: 22, overflow: 'hidden', position: 'relative', margin: 16,
+      borderRadius: 28, overflow: 'hidden', position: 'relative', margin: 16,
       background: 'var(--grad-hero)',
       boxShadow: '0 8px 40px oklch(38% 0.18 240 / 0.40), var(--sh-lg)',
     }}>
@@ -168,7 +168,7 @@ function BoldVariant({ name, genericPrice, brandPrice, savings, waUrl, onFindSto
 
         {/* Savings pill */}
         {savings && (
-          <div style={{ background: 'rgba(255,255,255,0.14)', border: '1px solid rgba(255,255,255,0.22)', borderRadius: 14, padding: '10px 14px', marginBottom: 16 }}>
+          <div style={{ background: 'rgba(255,255,255,0.14)', border: '1px solid rgba(255,255,255,0.22)', borderRadius: 18, padding: '10px 14px', marginBottom: 16 }}>
             <div style={{ fontSize: 15, fontWeight: 700, color: 'white' }}>Save {savings.percentage}% · ₹{savings.amount.toFixed(0)} cheaper</div>
             <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.68)', marginTop: 2 }}>Switch and save ₹{savings.annualSavings}/year</div>
           </div>
@@ -176,10 +176,10 @@ function BoldVariant({ name, genericPrice, brandPrice, savings, waUrl, onFindSto
 
         {/* Buttons */}
         <div style={{ display: 'flex', gap: 10 }}>
-          <button onClick={onFindStore} style={{ flex: 1, height: 42, background: 'white', color: 'oklch(38% 0.18 240)', border: 'none', borderRadius: 12, fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
+          <button onClick={onFindStore} style={{ flex: 1, height: 42, background: 'white', color: 'oklch(38% 0.18 240)', border: 'none', borderRadius: 16, fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
             Find store →
           </button>
-          <a href={waUrl} target="_blank" rel="noopener noreferrer" style={{ width: 42, height: 42, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.14)', border: '1px solid rgba(255,255,255,0.22)', borderRadius: 12, color: '#25D366', textDecoration: 'none' }}>
+          <a href={waUrl} target="_blank" rel="noopener noreferrer" style={{ width: 42, height: 42, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.14)', border: '1px solid rgba(255,255,255,0.22)', borderRadius: 16, color: '#25D366', textDecoration: 'none' }}>
             <WhatsAppIcon />
           </a>
         </div>

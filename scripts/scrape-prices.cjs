@@ -43,6 +43,7 @@ function parseArgs() {
   }
   return {
     limit: parseInt(get('--limit') ?? '20', 10),
+    offset: parseInt(get('--offset') ?? '0', 10),
     slug: get('--slug'),
     pharmacy: get('--pharmacy'),
     dryRun: args.includes('--dry-run'),
@@ -328,7 +329,7 @@ function cleanSearchName(medicine) {
   // Keep only the first active ingredient (before '+', '/', parentheses)
   const primary = raw.split(/\s*[+/]\s*/)[0].split('(')[0].trim()
   // Strip trailing manufacturer noise (starts with "manufactured", "marketed", "M/s")
-  const clean = primary.replace(/\s+(manufactured|marketed|m\/s|by).*/i, '').trim()
+  const clean = primary.replace(/\s+(manufactured|marketed|m\s*\/?s|by).*/i, '').trim()
   return clean.slice(0, 60) || raw.slice(0, 60)
 }
 
@@ -377,7 +378,7 @@ async function scrapeMedicine(browser, medicine, pharmacyFilter, dryRun) {
   return rows
 }
 
-async function loadMedicines(slug, limit) {
+async function loadMedicines(slug, limit, offset) {
   if (slug) {
     const { data, error } = await supabase
       .from('medicines')
@@ -393,19 +394,19 @@ async function loadMedicines(slug, limit) {
     .select('id, brand_name, salt_name, strength, slug')
     .not('nppa_ceiling', 'is', null)
     .order('brand_name')
-    .limit(limit)
+    .range(offset, offset + limit - 1)
   if (error) throw error
   return data ?? []
 }
 
 async function main() {
-  const { limit, slug, pharmacy, dryRun } = parseArgs()
+  const { limit, offset, slug, pharmacy, dryRun } = parseArgs()
 
   console.log('=== MedCompare Price Scraper ===')
   if (dryRun) console.log('DRY RUN — no DB writes')
   console.log()
 
-  const medicines = await loadMedicines(slug, limit)
+  const medicines = await loadMedicines(slug, limit, offset)
   console.log(`Medicines to scrape: ${medicines.length}`)
   if (pharmacy) console.log(`Pharmacy filter: ${pharmacy}`)
   console.log()
@@ -439,7 +440,11 @@ async function main() {
   }
 }
 
-main().catch(err => {
-  console.error('Fatal:', err.message)
-  process.exit(1)
-})
+module.exports = { scrapeMedicine }
+
+if (require.main === module) {
+  main().catch(err => {
+    console.error('Fatal:', err.message)
+    process.exit(1)
+  })
+}

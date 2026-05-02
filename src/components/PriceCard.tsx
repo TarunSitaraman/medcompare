@@ -37,7 +37,7 @@ export default function PriceCard({ pharmacy, pharmacyLabel, price, mrp, url, in
       border: isCheapest
         ? '1.5px solid var(--accent-border)'
         : '1.5px solid var(--glass-inner)',
-      borderRadius: 18,
+      borderRadius: 22,
       padding: '14px 16px',
       marginBottom: 10,
       boxShadow: isCheapest
@@ -51,7 +51,7 @@ export default function PriceCard({ pharmacy, pharmacyLabel, price, mrp, url, in
           position: 'absolute', top: 0, right: 0,
           background: 'var(--accent)', color: 'white',
           fontSize: 10, fontWeight: 700,
-          borderRadius: '0 18px 0 12px',
+          borderRadius: '0 22px 0 16px',
           padding: '4px 12px',
         }}>
           Best price
@@ -62,7 +62,7 @@ export default function PriceCard({ pharmacy, pharmacyLabel, price, mrp, url, in
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
         {/* Badge */}
         <div style={{
-          width: 46, height: 46, borderRadius: 14, flexShrink: 0,
+          width: 46, height: 46, borderRadius: 16, flexShrink: 0,
           background: cfg.color, color: 'white',
           fontSize: 12, fontWeight: 800,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -133,7 +133,7 @@ export default function PriceCard({ pharmacy, pharmacyLabel, price, mrp, url, in
             display: 'flex', alignItems: 'center', gap: 4,
             fontSize: 13, fontWeight: 600,
             textDecoration: 'none',
-            borderRadius: 10,
+            borderRadius: 14,
             ...(isCheapest ? {
               background: 'var(--grad-cta)', color: 'white',
               boxShadow: '0 2px 10px var(--accent-glow)',

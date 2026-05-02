@@ -107,7 +107,7 @@ function ComparePage() {
   if (notFound || !medicine) return (
     <div style={{ maxWidth: 680, margin: '40px auto', padding: '0 20px', textAlign: 'center' }}>
       <p style={{ fontSize: 15, color: 'var(--text-secondary)', marginBottom: 16 }}>Medicine not found.</p>
-      <button onClick={() => router.push('/')} style={{ height: 44, padding: '0 20px', background: 'var(--grad-cta)', color: 'white', border: 'none', borderRadius: 12, fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>
+      <button onClick={() => router.push('/')} style={{ height: 44, padding: '0 20px', background: 'var(--grad-cta)', color: 'white', border: 'none', borderRadius: 16, fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>
         Back to search
       </button>
     </div>
@@ -127,7 +127,7 @@ function ComparePage() {
       {/* AppNavbar */}
       <div className="glass-overlay sticky top-0 z-20" style={{ height: 56, borderBottom: '1px solid var(--glass-inner)' }}>
         <div style={{ maxWidth: 680, margin: '0 auto', padding: '0 20px', height: '100%', display: 'flex', alignItems: 'center', gap: 12 }}>
-          <button onClick={() => router.push('/')} style={{ width: 36, height: 36, borderRadius: 10, background: 'var(--bg-subtle)', border: '1px solid var(--border-strong)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-secondary)', cursor: 'pointer', flexShrink: 0 }}>
+          <button onClick={() => router.push('/')} style={{ width: 36, height: 36, borderRadius: 14, background: 'var(--bg-subtle)', border: '1px solid var(--border-strong)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-secondary)', cursor: 'pointer', flexShrink: 0 }}>
             <BackIcon />
           </button>
           <span style={{ fontFamily: 'var(--font-heading)', fontSize: 16, fontWeight: 700, color: 'var(--text-primary)', letterSpacing: '-0.025em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
@@ -176,7 +176,7 @@ function ComparePage() {
             Online pharmacy prices
           </h2>
           {withPrices.length === 0 ? (
-            <div className="glass-card" style={{ borderRadius: 18, padding: '24px 20px', textAlign: 'center' }}>
+            <div className="glass-card" style={{ borderRadius: 24, padding: '24px 20px', textAlign: 'center' }}>
               <div style={{ fontSize: 28, marginBottom: 10 }}>🕐</div>
               <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 6 }}>
                 Prices not yet scraped

@@ -15,7 +15,7 @@ export default function SavingsCard({ brandPrice, genericPrice, brandLabel, gene
       position: 'relative', overflow: 'hidden',
       background: 'var(--bg-glass)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
       border: '1px solid var(--glass-inner)',
-      borderRadius: 20,
+      borderRadius: 26,
       boxShadow: 'var(--sh-md), inset 0 1px 0 rgba(255,255,255,0.6)',
       padding: '16px 16px 14px',
     }}>
@@ -37,7 +37,7 @@ export default function SavingsCard({ brandPrice, genericPrice, brandLabel, gene
         {/* Brand pill */}
         <div style={{
           flex: 1, background: 'var(--bg-surface)', border: '1px solid var(--border-strong)',
-          borderRadius: 14, padding: '10px 14px',
+          borderRadius: 18, padding: '10px 14px',
         }}>
           <div style={{ fontSize: 10, fontWeight: 500, color: 'var(--text-muted)', marginBottom: 4 }}>{brandLabel}</div>
           <div style={{ fontFamily: 'var(--font-heading)', fontSize: '1.45rem', fontWeight: 800, color: 'var(--text-primary)', fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>
@@ -58,7 +58,7 @@ export default function SavingsCard({ brandPrice, genericPrice, brandLabel, gene
         {/* Generic pill */}
         <div style={{
           flex: 1, background: 'var(--bg-surface)', border: '1px solid var(--border-strong)',
-          borderRadius: 14, padding: '10px 14px',
+          borderRadius: 18, padding: '10px 14px',
         }}>
           <div style={{ fontSize: 10, fontWeight: 500, color: 'var(--text-muted)', marginBottom: 4 }}>{genericLabel}</div>
           <div style={{ fontFamily: 'var(--font-heading)', fontSize: '1.45rem', fontWeight: 800, color: 'var(--gold)', fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>
@@ -70,7 +70,7 @@ export default function SavingsCard({ brandPrice, genericPrice, brandLabel, gene
       {/* Footer savings bar */}
       <div style={{
         background: 'var(--grad-savings)',
-        borderRadius: 12, padding: '9px 14px',
+        borderRadius: 16, padding: '9px 14px',
         boxShadow: '0 4px 18px oklch(48% 0.18 240 / 0.35)',
         position: 'relative',
       }}>

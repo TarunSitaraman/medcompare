@@ -71,7 +71,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
             {/* App icon */}
             <div style={{
-              width: 48, height: 48, borderRadius: 14,
+              width: 48, height: 48, borderRadius: 18,
               background: 'rgba(255,255,255,0.18)',
               border: '1.5px solid rgba(255,255,255,0.30)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',

@@ -67,7 +67,7 @@ export default function StoreLocator({ slug, currentPincode, stores, janAushadhi
               paddingLeft: 44, paddingRight: 16,
               background: 'var(--bg-glass)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
               border: '1.5px solid var(--glass-inner)',
-              borderRadius: 16, fontSize: 15, color: 'var(--text-primary)',
+              borderRadius: 20, fontSize: 15, color: 'var(--text-primary)',
               transition: 'border-color 0.2s, box-shadow 0.2s',
             }}
             onFocus={e => { e.currentTarget.style.borderColor = 'var(--accent)'; e.currentTarget.style.boxShadow = '0 0 0 3px var(--accent-glow)' }}
@@ -81,7 +81,7 @@ export default function StoreLocator({ slug, currentPincode, stores, janAushadhi
             height: 52, padding: '0 20px',
             background: pincode.length === 6 ? 'var(--grad-cta)' : 'var(--bg-subtle)',
             color: pincode.length === 6 ? 'white' : 'var(--text-muted)',
-            border: 'none', borderRadius: 11,
+            border: 'none', borderRadius: 16,
             fontSize: 14, fontWeight: 600, cursor: pincode.length === 6 ? 'pointer' : 'not-allowed',
             transition: 'all 0.2s',
             whiteSpace: 'nowrap',
@@ -95,9 +95,9 @@ export default function StoreLocator({ slug, currentPincode, stores, janAushadhi
       {stores.length > 0 && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {stores.map(store => (
-            <div key={store.id} className="glass-card" style={{ borderRadius: 16, padding: '14px 16px', display: 'flex', gap: 12 }}>
+            <div key={store.id} className="glass-card" style={{ borderRadius: 20, padding: '14px 16px', display: 'flex', gap: 12 }}>
               {/* Pin icon wrap */}
-              <div style={{ width: 38, height: 38, borderRadius: 11, background: 'var(--periwinkle-surface)', border: '1px solid var(--periwinkle-border)', color: 'var(--periwinkle)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <div style={{ width: 38, height: 38, borderRadius: 14, background: 'var(--periwinkle-surface)', border: '1px solid var(--periwinkle-border)', color: 'var(--periwinkle)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                 <PinIcon />
               </div>
 
@@ -140,7 +140,7 @@ export default function StoreLocator({ slug, currentPincode, stores, janAushadhi
       )}
 
       {currentPincode && stores.length === 0 && (
-        <div className="glass-card" style={{ borderRadius: 16, padding: 16, fontSize: 13, color: 'var(--text-secondary)' }}>
+        <div className="glass-card" style={{ borderRadius: 20, padding: 16, fontSize: 13, color: 'var(--text-secondary)' }}>
           No Jan Aushadhi stores found near <strong>{currentPincode}</strong>. Try a nearby pincode or{' '}
           <a href="https://janaushadhi.gov.in/StoreLocation.aspx" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)' }}>
             search on the official website

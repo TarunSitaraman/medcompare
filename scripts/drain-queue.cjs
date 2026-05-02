@@ -4,7 +4,20 @@
  */
 const { chromium } = require('playwright')
 const { createClient } = require('@supabase/supabase-js')
-require('dotenv').config({ path: '.env.local' })
+const { existsSync, readFileSync } = require('fs')
+const path = require('path')
+
+function loadEnv() {
+  const p = path.resolve(process.cwd(), '.env.local')
+  if (!existsSync(p)) return
+  for (const line of readFileSync(p, 'utf8').split(/\r?\n/)) {
+    const sep = line.indexOf('='); if (sep <= 0) continue
+    const k = line.slice(0, sep).trim(); let v = line.slice(sep + 1).trim()
+    if ((v.startsWith('"') && v.endsWith('"')) || (v.startsWith("'") && v.endsWith("'"))) v = v.slice(1, -1)
+    if (!(k in process.env)) process.env[k] = v
+  }
+}
+loadEnv()
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
