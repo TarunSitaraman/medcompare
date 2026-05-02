@@ -1,37 +1,222 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* ── Design Tokens ─────────────────────────────────────────────────────────── */
+
 :root {
-  --bg: #F1F5F9;
-  --surface: #FFFFFF;
-  --text: #0F172A;
-  --muted: #64748B;
-  --border: #E2E8F0;
-  --green: #059669;
-  --green-bg: #ECFDF5;
-  --green-border: #A7F3D0;
-  --blue: #2563EB;
-  --blue-bg: #EFF6FF;
+  /* Primary (Sky Blue) */
+  --accent:             oklch(60% 0.17 228);
+  --accent-bright:      oklch(67% 0.19 225);
+  --accent-dim:         oklch(48% 0.18 240);
+  --accent-navy:        oklch(35% 0.18 248);
+  --accent-glow:        oklch(60% 0.17 228 / 0.22);
+  --accent-surface:     oklch(97% 0.04 228);
+  --accent-border:      oklch(87% 0.08 228);
+  --accent-text:        oklch(40% 0.18 240);
+
+  /* Gradients */
+  --grad-cta:     linear-gradient(135deg, oklch(60% 0.17 228) 0%, oklch(48% 0.18 240) 100%);
+  --grad-hero:    linear-gradient(135deg, oklch(35% 0.18 248) 0%, oklch(52% 0.17 225) 100%);
+  --grad-savings: linear-gradient(135deg, oklch(48% 0.16 240) 0%, oklch(62% 0.16 215) 100%);
+
+  /* Mint-Teal (Savings) */
+  --gold:           oklch(64% 0.16 175);
+  --gold-bright:    oklch(70% 0.18 172);
+  --gold-glow:      oklch(64% 0.16 175 / 0.22);
+  --gold-surface:   oklch(97% 0.04 175);
+  --gold-border:    oklch(87% 0.08 175);
+  --gold-text:      oklch(40% 0.16 175);
+
+  /* Soft Sky (Info / Stores) */
+  --periwinkle:         oklch(65% 0.13 215);
+  --periwinkle-glow:    oklch(65% 0.13 215 / 0.20);
+  --periwinkle-surface: oklch(97% 0.03 215);
+  --periwinkle-border:  oklch(87% 0.07 215);
+
+  /* Surfaces */
+  --bg-base:         oklch(97.5% 0.02 228);
+  --bg-surface:      #FFFFFF;
+  --bg-subtle:       oklch(95% 0.03 228);
+  --bg-glass:        rgba(255,255,255,0.72);
+  --bg-glass-strong: rgba(255,255,255,0.92);
+  --glass-border:    rgba(255,255,255,0.65);
+  --glass-inner:     rgba(255,255,255,0.96);
+
+  /* Text */
+  --text-primary:   oklch(18% 0.04 240);
+  --text-secondary: oklch(44% 0.05 235);
+  --text-muted:     oklch(66% 0.04 230);
+
+  /* Borders */
+  --border:        oklch(90% 0.03 228);
+  --border-strong: oklch(83% 0.04 228);
+
+  /* Pharmacy Brand Colors */
+  --ph-1mg:       oklch(52% 0.19 20);
+  --ph-pharmeasy: oklch(60% 0.17 48);
+  --ph-apollo:    oklch(48% 0.18 240);
+  --ph-netmeds:   oklch(52% 0.16 192);
+
+  /* Shadows */
+  --sh-xs: 0 1px 3px rgba(30,60,120,0.06);
+  --sh-sm: 0 2px 10px rgba(30,60,120,0.09), 0 1px 2px rgba(30,60,120,0.04);
+  --sh-md: 0 4px 20px rgba(30,60,120,0.11), 0 2px 6px rgba(30,60,120,0.05);
+  --sh-lg: 0 8px 36px rgba(30,60,120,0.14), 0 4px 12px rgba(30,60,120,0.06);
+
+  /* Animation */
+  --ease-spring:     cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-out-smooth: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out:     cubic-bezier(0.4, 0, 0.6, 1);
+  --duration-fast:   150ms;
+  --duration-base:   200ms;
+  --duration-slow:   300ms;
+
+  /* Typography */
+  --font-heading: 'Plus Jakarta Sans', sans-serif;
+  --font-body:    'Inter', sans-serif;
+
+  /* Spacing (8px grid) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+
+  /* Border Radius */
+  --radius-sm:   8px;
+  --radius-md:   12px;
+  --radius-lg:   16px;
+  --radius-xl:   18px;
+  --radius-2xl:  20px;
+  --radius-3xl:  22px;
+  --radius-full: 9999px;
 }
 
+/* ── Dark Mode ─────────────────────────────────────────────────────────────── */
+
+[data-theme="dark"] {
+  --accent:             oklch(68% 0.18 228);
+  --accent-bright:      oklch(75% 0.20 225);
+  --accent-dim:         oklch(54% 0.17 240);
+  --accent-navy:        oklch(42% 0.18 248);
+  --accent-glow:        oklch(68% 0.18 228 / 0.28);
+  --accent-surface:     oklch(20% 0.06 240);
+  --accent-border:      oklch(36% 0.12 240);
+  --accent-text:        oklch(68% 0.18 228);
+  --grad-cta:     linear-gradient(135deg, oklch(68% 0.18 228) 0%, oklch(52% 0.18 245) 100%);
+  --grad-hero:    linear-gradient(135deg, oklch(25% 0.16 252) 0%, oklch(42% 0.17 232) 100%);
+  --grad-savings: linear-gradient(135deg, oklch(38% 0.16 248) 0%, oklch(56% 0.16 220) 100%);
+
+  --gold:           oklch(72% 0.17 175);
+  --gold-bright:    oklch(78% 0.19 172);
+  --gold-glow:      oklch(72% 0.17 175 / 0.28);
+  --gold-surface:   oklch(20% 0.06 175);
+  --gold-border:    oklch(36% 0.10 175);
+  --gold-text:      oklch(72% 0.17 175);
+
+  --periwinkle:         oklch(68% 0.14 215);
+  --periwinkle-glow:    oklch(68% 0.14 215 / 0.22);
+  --periwinkle-surface: oklch(20% 0.05 215);
+  --periwinkle-border:  oklch(36% 0.09 215);
+
+  --bg-base:         oklch(11% 0.04 240);
+  --bg-surface:      oklch(15% 0.05 238);
+  --bg-subtle:       oklch(18% 0.05 236);
+  --bg-glass:        oklch(15% 0.05 238 / 0.78);
+  --bg-glass-strong: oklch(15% 0.05 238 / 0.94);
+  --glass-border:    rgba(255,255,255,0.07);
+  --glass-inner:     rgba(255,255,255,0.11);
+
+  --text-primary:   oklch(95% 0.02 230);
+  --text-secondary: oklch(65% 0.04 232);
+  --text-muted:     oklch(44% 0.04 235);
+
+  --border:        rgba(255,255,255,0.07);
+  --border-strong: rgba(255,255,255,0.12);
+
+  --sh-xs: 0 1px 3px rgba(0,0,0,0.45);
+  --sh-sm: 0 2px 10px rgba(0,0,0,0.50), 0 1px 3px rgba(0,0,0,0.30);
+  --sh-md: 0 4px 20px rgba(0,0,0,0.58), 0 2px 6px rgba(0,0,0,0.30);
+  --sh-lg: 0 8px 40px rgba(0,0,0,0.68), 0 4px 12px rgba(0,0,0,0.40);
+}
+
+/* ── Base ──────────────────────────────────────────────────────────────────── */
+
+* { box-sizing: border-box; }
+
 body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--bg-base);
+  color: var(--text-primary);
+  font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-* {
-  box-sizing: border-box;
-}
+h1, h2, h3, h4 { font-family: var(--font-heading); }
+
+input:focus { outline: none; }
 
 ::selection {
-  background: #BFDBFE;
-  color: #1E3A5F;
+  background: var(--accent-surface);
+  color: var(--accent-text);
 }
 
-input:focus {
-  outline: none;
+/* ── Glass Utilities ───────────────────────────────────────────────────────── */
+
+.glass-card {
+  background: var(--bg-glass);
+  backdrop-filter: blur(16px) saturate(160%);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  border: 1.5px solid var(--glass-inner);
+  box-shadow: var(--sh-sm), inset 0 1px 0 rgba(255,255,255,0.45);
+}
+
+.glass-overlay {
+  background: var(--bg-glass-strong);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+  .glass-card,
+  .glass-overlay {
+    background: var(--bg-surface);
+  }
+}
+
+/* ── Animations ────────────────────────────────────────────────────────────── */
+
+@keyframes pgIn {
+  from { transform: translateX(28px); opacity: 0; }
+  to   { transform: none; opacity: 1; }
+}
+
+.page-enter {
+  animation: pgIn 0.3s var(--ease-out-smooth);
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.5; transform: scale(0.85); }
+}
+
+@keyframes splash-icon {
+  from { opacity: 0; transform: scale(0.6); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes splash-fade-up {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes splash-out {
+  from { opacity: 1; }
+  to   { opacity: 0; }
 }
