@@ -114,7 +114,7 @@ function ComparePage() {
   return (
     <div className="page-enter">
       {/* AppNavbar */}
-      <div className="glass-overlay sticky top-14 z-20" style={{ height: 56, borderBottom: '1px solid var(--glass-inner)' }}>
+      <div className="glass-overlay sticky top-0 z-20" style={{ height: 56, borderBottom: '1px solid var(--glass-inner)' }}>
         <div style={{ maxWidth: 680, margin: '0 auto', padding: '0 20px', height: '100%', display: 'flex', alignItems: 'center', gap: 12 }}>
           <button onClick={() => router.push('/')} style={{ width: 36, height: 36, borderRadius: 10, background: 'var(--bg-subtle)', border: '1px solid var(--border-strong)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-secondary)', cursor: 'pointer', flexShrink: 0 }}>
             <BackIcon />

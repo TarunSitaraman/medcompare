@@ -156,6 +156,19 @@ body {
   font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+  /* push content below Android status bar */
+  padding-top: env(safe-area-inset-top);
+}
+
+/* Remove tap flash on Android WebView */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Faster touch response on buttons/links */
+button, a, input, [role="button"] {
+  touch-action: manipulation;
 }
 
 h1, h2, h3, h4 { font-family: var(--font-heading); }
@@ -188,6 +201,23 @@ input:focus { outline: none; }
   .glass-overlay {
     background: var(--bg-surface);
   }
+}
+
+/* ── Animations ────────────────────────────────────────────────────────────── */
+
+/* ── Responsive Utilities (replaces Tailwind responsive variants) ──────────── */
+
+/* Hidden by default (mobile-first) */
+.show-desktop { display: none !important; }
+.show-lg      { display: none !important; }
+
+@media (min-width: 640px) {
+  .show-desktop { display: block !important; }
+  .hide-desktop { display: none !important; }
+}
+
+@media (min-width: 1024px) {
+  .show-lg { display: block !important; }
 }
 
 /* ── Animations ────────────────────────────────────────────────────────────── */

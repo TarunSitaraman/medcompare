@@ -1,7 +1,14 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Plus_Jakarta_Sans, Inter } from 'next/font/google'
 import './globals.css'
 import ThemeToggle from '@/components/ThemeToggle'
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: '#1a3060',
+}
 
 const jakarta = Plus_Jakarta_Sans({
   subsets: ['latin'],
@@ -53,44 +60,51 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         `}} />
       </head>
       <body>
-        {/* Sticky top navbar */}
-        <header className="glass-overlay sticky top-0 z-50 border-b" style={{ borderColor: 'var(--glass-inner)', height: 56 }}>
-          <div className="max-w-5xl mx-auto px-5 h-full flex items-center justify-between">
-            <a href="/" className="flex items-center gap-2.5">
-              <span style={{
-                width: 34, height: 34,
-                background: 'var(--grad-cta)',
-                borderRadius: 10,
-                boxShadow: '0 4px 12px var(--accent-glow)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}>
-                <LogoIcon />
-              </span>
-              <span style={{ fontFamily: 'var(--font-heading)', fontSize: 17, fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--text-primary)' }}>
-                Medi<span style={{ color: 'var(--accent)' }}>Compare</span>
-              </span>
-            </a>
-
-            <nav className="flex items-center gap-1">
-              <a href="/jan-aushadhi" style={{ fontSize: 13, color: 'var(--text-secondary)', padding: '6px 12px', borderRadius: 8 }}
-                 className="hover:bg-[var(--bg-subtle)] transition-colors">
-                Jan Aushadhi
-              </a>
-              <ThemeToggle />
-            </nav>
+        {/* App banner header */}
+        <header style={{
+          background: 'linear-gradient(135deg, oklch(32% 0.20 250) 0%, oklch(50% 0.18 232) 100%)',
+          padding: '18px 24px 20px',
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+            {/* App icon */}
+            <div style={{
+              width: 48, height: 48, borderRadius: 14,
+              background: 'rgba(255,255,255,0.18)',
+              border: '1.5px solid rgba(255,255,255,0.30)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              flexShrink: 0,
+            }}>
+              <svg width="28" height="28" viewBox="0 0 36 36" fill="none">
+                <rect x="4" y="10" width="12" height="16" rx="6" fill="white" opacity="0.95"/>
+                <rect x="14" y="10" width="12" height="16" rx="6" fill="white" opacity="0.70"/>
+                <rect x="14" y="10" width="2" height="16" fill="white" opacity="0.22"/>
+                <path d="M20 18 L28 18 M25 15 L28 18 L25 21" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" opacity="0.9"/>
+              </svg>
+            </div>
+            {/* Wordmark */}
+            <div>
+              <div style={{ fontFamily: 'var(--font-heading)', fontSize: 22, fontWeight: 800, letterSpacing: '-0.03em', color: 'white', lineHeight: 1.1 }}>
+                Medi<span style={{ color: 'oklch(85% 0.14 210)' }}>Compare</span>
+              </div>
+              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.60)', marginTop: 1, fontWeight: 500 }}>
+                Medicine price comparison · India
+              </div>
+            </div>
           </div>
+          <ThemeToggle />
         </header>
 
         <main className="page-enter">{children}</main>
 
-        {/* Bottom padding for mobile bottom nav */}
-        <div className="h-24 sm:hidden" />
+        {/* Bottom padding for mobile bottom nav + safe area */}
+        <div className="sm:hidden" style={{ height: 'calc(64px + env(safe-area-inset-bottom))' }} />
 
         {/* Bottom nav (mobile only) */}
         <BottomNav />
 
         <footer style={{ borderTop: '1px solid var(--border)', background: 'var(--bg-surface)', marginTop: 64, paddingBlock: 40 }}
-                className="hidden sm:block">
+                className="show-desktop">
           <div className="max-w-5xl mx-auto px-5 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2">
               <span style={{
@@ -123,9 +137,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
 function BottomNav() {
   return (
-    <nav className="sm:hidden fixed bottom-0 left-0 right-0 z-50 glass-overlay"
-         style={{ height: 88, borderTop: '1px solid var(--glass-inner)' }}>
-      <div className="flex items-start justify-around pt-2.5">
+    <nav className="hide-desktop fixed bottom-0 left-0 right-0 z-50 glass-overlay"
+         style={{ borderTop: '1px solid var(--glass-inner)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
+      <div className="flex items-start justify-around pt-2.5" style={{ height: 64 }}>
         {[
           {
             href: '/', label: 'Home',
