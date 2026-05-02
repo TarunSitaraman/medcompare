@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import type { SearchResult } from '@/lib/data/medicines'
+import { searchMedicines, logSearch, type SearchResult } from '@/lib/data/medicines'
 import SplashScreen from '@/components/SplashScreen'
 import SavingsCard from '@/components/SavingsCard'
 
@@ -42,19 +42,20 @@ export default function HomePage() {
     debounceRef.current = setTimeout(async () => {
       setLoading(true)
       try {
-        const res = await fetch(`/api/search?q=${encodeURIComponent(query)}`)
-        const data = await res.json()
-        setSuggestions(data.results ?? [])
+        const results = await searchMedicines(query)
+        await logSearch(query, results.length > 0, results[0]?.id)
+        setSuggestions(results)
         setShowDropdown(true)
+      } catch {
+        setSuggestions([])
       } finally { setLoading(false) }
     }, 250)
   }, [query])
 
   function handleSelect(medicine: SearchResult) {
-    const params = new URLSearchParams()
+    const params = new URLSearchParams({ slug: medicine.slug })
     if (medicine.matched_brand) params.set('brand', medicine.matched_brand)
-    const qs = params.toString()
-    router.push(`/compare/${medicine.slug}${qs ? `?${qs}` : ''}`)
+    router.push(`/compare?${params.toString()}`)
   }
 
   function handleSubmit(e: React.FormEvent) {

@@ -1,11 +1,11 @@
 import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
+  output: 'export',
+  trailingSlash: true,
   images: {
-    remotePatterns: [],
+    unoptimized: true,
   },
-  // Allow long-running scrape routes
-  serverExternalPackages: ['playwright'],
 }
 
 export default nextConfig

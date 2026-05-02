@@ -30,7 +30,7 @@ export default function StoreLocator({ slug, currentPincode, stores, janAushadhi
   function handleSearch(e: React.FormEvent) {
     e.preventDefault()
     if (pincode.length === 6) {
-      router.push(`/compare/${slug}?pincode=${pincode}`)
+      router.push(`/compare?slug=${slug}&pincode=${pincode}`)
     }
   }
 
