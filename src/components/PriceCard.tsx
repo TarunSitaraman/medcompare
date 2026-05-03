@@ -18,9 +18,10 @@ interface Props {
   minPrice: number
   perUnit?: string | null
   cashback?: string | null
+  nppaCeiling?: number | null
 }
 
-export default function PriceCard({ pharmacy, pharmacyLabel, price, mrp, url, inStock, scrapedAt, isCheapest, minPrice, perUnit, cashback }: Props) {
+export default function PriceCard({ pharmacy, pharmacyLabel, price, mrp, url, inStock, scrapedAt, isCheapest, minPrice, perUnit, cashback, nppaCeiling }: Props) {
   const hoursAgo = Math.round((Date.now() - new Date(scrapedAt).getTime()) / 3600000)
   const isStale = hoursAgo > 12
   const cfg = PHARMACY_CONFIG[pharmacy] ?? { color: 'oklch(55% 0.05 240)', abbr: pharmacy.slice(0, 2).toUpperCase() }
@@ -118,6 +119,18 @@ export default function PriceCard({ pharmacy, pharmacyLabel, price, mrp, url, in
               : 'var(--border-strong)',
             transition: 'width 0.7s cubic-bezier(0.34,1.4,0.64,1)',
           }} />
+        </div>
+      )}
+
+      {/* NPPA overcharge warning */}
+      {price !== null && nppaCeiling !== null && nppaCeiling !== undefined && price > nppaCeiling && (
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: 5,
+          background: 'oklch(55% 0.18 25 / 0.1)', border: '1px solid oklch(55% 0.18 25 / 0.3)',
+          borderRadius: 10, padding: '5px 10px', marginBottom: 10,
+          fontSize: 11, fontWeight: 600, color: 'oklch(50% 0.18 25)',
+        }}>
+          ⚠ Exceeds NPPA ceiling of ₹{nppaCeiling} by ₹{(price - nppaCeiling).toFixed(2)}
         </div>
       )}
 

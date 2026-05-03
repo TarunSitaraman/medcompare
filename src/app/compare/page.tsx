@@ -16,7 +16,7 @@ import GenericAlert from '@/components/GenericAlert'
 import StoreLocator from '@/components/StoreLocator'
 
 function cleanIngredient(s: string): string {
-  return s.replace(/\s+(manufactured|marketed|m\/s|by)\b.*/i, '').trim()
+  return s.replace(/\s+(manufactured|marketed|m\s*\/?s|by)\b.*/i, '').trim()
 }
 
 function getHeading(brand: string | null | undefined, saltName: string): string {
@@ -201,6 +201,7 @@ function ComparePage() {
                   isCheapest={i === 0}
                   minPrice={minPrice}
                   perUnit={price.price_per_unit ? `₹${price.price_per_unit}/unit` : null}
+                  nppaCeiling={medicine.nppa_ceiling ?? null}
                 />
               ))}
             </div>
