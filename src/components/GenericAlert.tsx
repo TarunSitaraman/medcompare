@@ -57,7 +57,7 @@ interface VProps {
 function DefaultVariant({ name, genericPrice, brandPrice, savings, waUrl, onFindStore }: VProps) {
   return (
     <div style={{
-      margin: 16, borderRadius: 28,
+      borderRadius: 28,
       background: 'var(--bg-glass)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
       border: '1.5px solid var(--gold-border)',
       boxShadow: '0 4px 28px var(--gold-glow), var(--sh-md)',
@@ -119,7 +119,7 @@ function DefaultVariant({ name, genericPrice, brandPrice, savings, waUrl, onFind
 
 function CompactVariant({ name, genericPrice, brandPrice, savings, waUrl, onFindStore }: VProps) {
   return (
-    <div className="glass-card" style={{ borderRadius: 26, padding: 16, margin: 16 }}>
+    <div className="glass-card" style={{ borderRadius: 26, padding: 16 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
         <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)' }}>{name}</span>
         <span style={{ fontSize: 10, fontWeight: 600, background: 'var(--gold-surface)', border: '1px solid var(--gold-border)', color: 'var(--gold-text)', borderRadius: 12, padding: '2px 7px' }}>Jan Aushadhi</span>
@@ -140,7 +140,7 @@ function CompactVariant({ name, genericPrice, brandPrice, savings, waUrl, onFind
 function BoldVariant({ name, genericPrice, brandPrice, savings, waUrl, onFindStore }: VProps) {
   return (
     <div style={{
-      borderRadius: 28, overflow: 'hidden', position: 'relative', margin: 16,
+      borderRadius: 28, overflow: 'hidden', position: 'relative',
       background: 'var(--grad-hero)',
       boxShadow: '0 8px 40px oklch(38% 0.18 240 / 0.40), var(--sh-lg)',
     }}>

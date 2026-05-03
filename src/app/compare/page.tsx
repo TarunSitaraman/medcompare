@@ -65,6 +65,7 @@ function ComparePage() {
   const [loading, setLoading] = useState(true)
   const [notFound, setNotFound] = useState(false)
   const [queued, setQueued] = useState(false)
+  const storeLocatorRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (!slug) { setNotFound(true); setLoading(false); return }
@@ -161,13 +162,16 @@ function ComparePage() {
 
         {/* Generic alert */}
         {generic?.jan_aushadhi_mrp && (
+          <div style={{ marginBottom: 20 }}>
           <GenericAlert
             saltName={medicine.salt_name}
             janAushadhiName={generic.jan_aushadhi_name}
             janAushadhiPrice={generic.jan_aushadhi_mrp}
             brandPrice={cheapestOnline}
             savings={savings}
+            onFindStore={() => storeLocatorRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
           />
+          </div>
         )}
 
         {/* Prices */}
@@ -209,6 +213,7 @@ function ComparePage() {
         </section>
 
         {/* Store locator */}
+        <div ref={storeLocatorRef} />
         <StoreLocator
           slug={slug}
           currentPincode={pincode}
