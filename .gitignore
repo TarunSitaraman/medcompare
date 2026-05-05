@@ -20,6 +20,9 @@ data/
 # Debug output
 data/debug-scrapers/
 
+# Allow src/lib/data — app source code, not raw data
+!src/lib/data/
+
 # OS
 .DS_Store
 Thumbs.db
