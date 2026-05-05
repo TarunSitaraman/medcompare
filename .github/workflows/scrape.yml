@@ -1,0 +1,51 @@
+name: Scrape Medicine Prices
+
+on:
+  schedule:
+    # Every 4 hours
+    - cron: '0 */4 * * *'
+  workflow_dispatch:
+    inputs:
+      slug:
+        description: 'Scrape a single medicine by slug'
+        required: false
+      stale_days:
+        description: 'Re-scrape prices older than N days (default: 1)'
+        required: false
+        default: '1'
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install chromium --with-deps
+
+      - name: Run scraper (single slug)
+        if: ${{ github.event.inputs.slug != '' }}
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: node scripts/scrape-prices.cjs --slug "${{ github.event.inputs.slug }}"
+
+      - name: Run scraper (scheduled coverage)
+        if: ${{ github.event.inputs.slug == '' }}
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          # Drain user-queued medicines first, then stale coverage
+          node scripts/scrape-prices.cjs --queue --limit 30
+          node scripts/scrape-prices.cjs --stale ${{ github.event.inputs.stale_days || '1' }} --limit 80

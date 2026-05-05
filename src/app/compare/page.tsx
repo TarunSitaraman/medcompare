@@ -17,6 +17,15 @@ import StoreLocator from '@/components/StoreLocator'
 import { isSaved, addSaved, removeSaved } from '@/lib/saved'
 import { isInCart, addToCart, removeFromCart } from '@/lib/cart'
 
+function formatAge(isoDate: string): string {
+  const diffMs = Date.now() - new Date(isoDate).getTime()
+  const hours = Math.floor(diffMs / 3_600_000)
+  if (hours < 1) return 'just now'
+  if (hours < 24) return `${hours}h ago`
+  const days = Math.floor(hours / 24)
+  return `${days}d ago`
+}
+
 function cleanIngredient(s: string): string {
   return s.replace(/\s+(manufactured|marketed|m\s*\/?s|by)\b.*/i, '').trim()
 }
@@ -69,6 +78,8 @@ function ComparePage() {
   const [queued, setQueued] = useState(false)
   const [saved, setSaved] = useState(false)
   const [inCart, setInCart] = useState(false)
+  const [refreshing, setRefreshing] = useState(false)
+  const [refreshError, setRefreshError] = useState<string | null>(null)
   const storeLocatorRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -144,9 +155,35 @@ function ComparePage() {
     else { addSaved(medicinePayload()); setSaved(true) }
   }
 
-  function toggleCart() {
-    if (inCart) { removeFromCart(medicine!.id); setInCart(false) }
-    else { addToCart(medicinePayload()); setInCart(true) }
+  function handleAddToCart() {
+    if (!inCart) { addToCart(medicinePayload()); setInCart(true) }
+  }
+
+  async function handleRefreshPrices() {
+    if (!medicine || refreshing) return
+    setRefreshing(true)
+    setRefreshError(null)
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+      const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      const res = await fetch(`${supabaseUrl}/functions/v1/live-scrape`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session?.access_token ?? anonKey}`,
+          'apikey': anonKey,
+        },
+        body: JSON.stringify({ medicine_id: medicine.id, slug: medicine.slug, name: medicine.brand_name ?? medicine.salt_name, strength: medicine.strength }),
+      })
+      if (!res.ok) throw new Error('Scrape failed')
+      const fresh = await getPricesForMedicine(medicine.id)
+      setPrices(fresh)
+    } catch {
+      setRefreshError('Could not fetch live prices — try again shortly.')
+    } finally {
+      setRefreshing(false)
+    }
   }
 
   return (
@@ -170,9 +207,10 @@ function ComparePage() {
             </svg>
           </button>
           <button
-            onClick={toggleCart}
-            aria-label={inCart ? 'Remove from cart' : 'Add to cart'}
-            style={{ width: 36, height: 36, borderRadius: 14, background: inCart ? 'var(--gold-surface)' : 'var(--bg-subtle)', border: `1px solid ${inCart ? 'var(--gold-border)' : 'var(--border-strong)'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0, transition: 'all 0.2s ease' }}
+            onClick={handleAddToCart}
+            aria-label={inCart ? 'In cart' : 'Add to cart'}
+            title={inCart ? 'In your cart — remove from cart page' : 'Add to cart'}
+            style={{ width: 36, height: 36, borderRadius: 14, background: inCart ? 'var(--gold-surface)' : 'var(--bg-subtle)', border: `1px solid ${inCart ? 'var(--gold-border)' : 'var(--border-strong)'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: inCart ? 'default' : 'pointer', flexShrink: 0, transition: 'all 0.2s ease' }}
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill={inCart ? 'var(--gold)' : 'none'} stroke={inCart ? 'var(--gold)' : 'var(--text-secondary)'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
@@ -221,9 +259,33 @@ function ComparePage() {
 
         {/* Prices */}
         <section style={{ marginTop: 28 }}>
-          <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: 15, fontWeight: 700, color: 'var(--text-primary)', letterSpacing: '-0.02em', marginBottom: 12 }}>
-            Online pharmacy prices
-          </h2>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12, gap: 8 }}>
+            <div>
+              <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: 15, fontWeight: 700, color: 'var(--text-primary)', letterSpacing: '-0.02em', margin: 0 }}>
+                Online pharmacy prices
+              </h2>
+              {prices[0]?.scraped_at && (
+                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 3 }}>
+                  Updated {formatAge(prices[0].scraped_at)}
+                </div>
+              )}
+            </div>
+            <button
+              onClick={handleRefreshPrices}
+              disabled={refreshing}
+              style={{ display: 'flex', alignItems: 'center', gap: 5, height: 32, padding: '0 12px', borderRadius: 10, background: 'var(--bg-subtle)', border: '1px solid var(--border-strong)', fontSize: 12, fontWeight: 600, color: refreshing ? 'var(--text-muted)' : 'var(--accent)', cursor: refreshing ? 'not-allowed' : 'pointer', flexShrink: 0, transition: 'all 0.2s' }}
+            >
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ animation: refreshing ? 'spin 0.9s linear infinite' : 'none' }}>
+                <path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/>
+              </svg>
+              {refreshing ? 'Refreshing…' : 'Live prices'}
+            </button>
+          </div>
+          {refreshError && (
+            <div style={{ fontSize: 12, color: 'var(--text-muted)', background: 'var(--bg-subtle)', borderRadius: 10, padding: '8px 12px', marginBottom: 10 }}>
+              {refreshError}
+            </div>
+          )}
           {withPrices.length === 0 ? (
             <div className="glass-card" style={{ borderRadius: 24, padding: '24px 20px', textAlign: 'center' }}>
               <div style={{ fontSize: 28, marginBottom: 10 }}>🕐</div>
