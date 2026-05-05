@@ -36,3 +36,5 @@ playwright-report/
 .claude/
 .next/
 out/
+
+.vercel

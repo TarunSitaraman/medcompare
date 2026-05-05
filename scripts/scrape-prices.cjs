@@ -3,11 +3,14 @@
  * Reads medicines from Supabase and upserts results into the prices table.
  *
  * Usage:
- *   node scripts/scrape-prices.cjs                  # scrape top 20 medicines
- *   node scripts/scrape-prices.cjs --limit 50        # scrape top 50
- *   node scripts/scrape-prices.cjs --slug dolo-650   # single medicine
- *   node scripts/scrape-prices.cjs --pharmacy 1mg    # only one pharmacy
- *   node scripts/scrape-prices.cjs --dry-run         # no DB writes
+ *   node scripts/scrape-prices.cjs                        # coverage mode: NPPA first, skip fresh prices (default 50)
+ *   node scripts/scrape-prices.cjs --queue                # drain pending scrape_queue (medicines users searched for)
+ *   node scripts/scrape-prices.cjs --stale 3              # re-scrape prices older than 3 days
+ *   node scripts/scrape-prices.cjs --all                  # ignore freshness, scrape everything in range
+ *   node scripts/scrape-prices.cjs --limit 100            # scrape up to 100 medicines
+ *   node scripts/scrape-prices.cjs --slug dolo-650        # single medicine
+ *   node scripts/scrape-prices.cjs --pharmacy 1mg         # only one pharmacy
+ *   node scripts/scrape-prices.cjs --dry-run              # no DB writes
  */
 const { createClient } = require('@supabase/supabase-js')
 const { existsSync, readFileSync } = require('fs')
@@ -42,11 +45,17 @@ function parseArgs() {
     return i !== -1 ? args[i + 1] : null
   }
   return {
-    limit: parseInt(get('--limit') ?? '20', 10),
+    limit: parseInt(get('--limit') ?? '50', 10),
     offset: parseInt(get('--offset') ?? '0', 10),
     slug: get('--slug'),
     pharmacy: get('--pharmacy'),
     dryRun: args.includes('--dry-run'),
+    // --queue: drain pending scrape_queue entries first (medicines users searched for)
+    queue: args.includes('--queue'),
+    // --stale N: re-scrape medicines whose prices are older than N days (default 7)
+    staleDays: parseInt(get('--stale') ?? '7', 10),
+    // --all: ignore stale filter, scrape everything in range
+    all: args.includes('--all'),
   }
 }
 
@@ -341,31 +350,25 @@ async function scrapeMedicine(browser, medicine, pharmacyFilter, dryRun) {
     ? { [pharmacyFilter]: PHARMACIES[pharmacyFilter] }
     : PHARMACIES
 
-  const results = await Promise.allSettled(
-    Object.entries(scrapers).map(async ([pharmacy, fn]) => {
-      const result = await fn(browser, name, strength)
-      return { pharmacy, ...result }
-    })
-  )
-
+  // Run pharmacies sequentially so a browser crash in one doesn't kill the others
   const rows = []
-  for (const r of results) {
-    if (r.status === 'rejected') {
-      console.error(`    ${r.reason?.message ?? r.reason}`)
-      continue
+  for (const [pharmacy, fn] of Object.entries(scrapers)) {
+    try {
+      const result = await fn(browser, name, strength)
+      const tag = result.price ? `₹${result.price}` : 'no price'
+      console.log(`    ${pharmacy.padEnd(12)} ${tag}`)
+      rows.push({
+        medicine_id: medicine.id,
+        pharmacy,
+        price: result.price ?? null,
+        price_per_unit: null,
+        url: result.url ?? null,
+        in_stock: result.inStock,
+        scraped_at: new Date().toISOString(),
+      })
+    } catch (err) {
+      console.error(`    ${pharmacy.padEnd(12)} error: ${err.message?.split('\n')[0] ?? err}`)
     }
-    const { pharmacy, price, url, inStock } = r.value
-    const tag = price ? `₹${price}` : 'no price'
-    console.log(`    ${pharmacy.padEnd(12)} ${tag}`)
-    rows.push({
-      medicine_id: medicine.id,
-      pharmacy,
-      price: price ?? null,
-      price_per_unit: null,
-      url: url ?? null,
-      in_stock: inStock,
-      scraped_at: new Date().toISOString(),
-    })
   }
 
   if (!dryRun && rows.length > 0) {
@@ -378,7 +381,80 @@ async function scrapeMedicine(browser, medicine, pharmacyFilter, dryRun) {
   return rows
 }
 
-async function loadMedicines(slug, limit, offset) {
+async function loadQueueMedicines(limit) {
+  const { data: queueRows, error } = await supabase
+    .from('scrape_queue')
+    .select('id, medicine_id')
+    .eq('status', 'pending')
+    .order('created_at')
+    .limit(limit)
+
+  if (error) throw error
+  if (!queueRows?.length) return { medicines: [], queueRowIds: [] }
+
+  const ids = queueRows.map(r => r.medicine_id)
+  const { data: medicines, error: medErr } = await supabase
+    .from('medicines')
+    .select('id, brand_name, salt_name, strength, slug')
+    .in('id', ids)
+  if (medErr) throw medErr
+
+  return { medicines: medicines ?? [], queueRowIds: queueRows.map(r => r.id) }
+}
+
+async function markQueueDone(queueRowIds) {
+  if (!queueRowIds.length) return
+  await supabase
+    .from('scrape_queue')
+    .update({ status: 'done', updated_at: new Date().toISOString() })
+    .in('id', queueRowIds)
+}
+
+async function loadCoverageMedicines(limit, offset, staleDays, all) {
+  // Get medicine IDs that already have recent prices so we can skip them
+  const freshCutoff = new Date(Date.now() - staleDays * 24 * 60 * 60 * 1000).toISOString()
+
+  let freshIds = new Set()
+  if (!all) {
+    const { data: freshPrices } = await supabase
+      .from('prices')
+      .select('medicine_id')
+      .gt('scraped_at', freshCutoff)
+    freshIds = new Set((freshPrices ?? []).map(p => p.medicine_id))
+  }
+
+  // Priority 1: NPPA-regulated medicines without fresh prices
+  const { data: nppa, error: e1 } = await supabase
+    .from('medicines')
+    .select('id, brand_name, salt_name, strength, slug')
+    .not('nppa_ceiling', 'is', null)
+    .order('brand_name')
+    .limit(limit * 2) // fetch extra so we have room to filter
+  if (e1) throw e1
+
+  const nppaFiltered = (nppa ?? []).filter(m => !freshIds.has(m.id))
+
+  if (nppaFiltered.length >= limit) {
+    return nppaFiltered.slice(offset, offset + limit)
+  }
+
+  // Priority 2: fill remaining slots from the rest of the catalogue
+  const needed = limit - nppaFiltered.length
+  const nppaIds = new Set((nppa ?? []).map(m => m.id))
+
+  const { data: rest, error: e2 } = await supabase
+    .from('medicines')
+    .select('id, brand_name, salt_name, strength, slug')
+    .not('id', 'in', `(${[...nppaIds].join(',') || 'null'})`)
+    .order('brand_name')
+    .range(offset, offset + needed * 2 - 1)
+  if (e2) throw e2
+
+  const restFiltered = (rest ?? []).filter(m => !freshIds.has(m.id)).slice(0, needed)
+  return [...nppaFiltered, ...restFiltered]
+}
+
+async function loadMedicines(slug, limit, offset, opts) {
   if (slug) {
     const { data, error } = await supabase
       .from('medicines')
@@ -386,30 +462,39 @@ async function loadMedicines(slug, limit, offset) {
       .eq('slug', slug)
       .single()
     if (error) throw new Error(`Medicine not found: ${slug}`)
-    return [data]
+    return { medicines: [data], queueRowIds: [] }
   }
 
-  const { data, error } = await supabase
-    .from('medicines')
-    .select('id, brand_name, salt_name, strength, slug')
-    .not('nppa_ceiling', 'is', null)
-    .order('brand_name')
-    .range(offset, offset + limit - 1)
-  if (error) throw error
-  return data ?? []
+  if (opts.queue) {
+    const result = await loadQueueMedicines(limit)
+    if (result.medicines.length) return result
+    console.log('Queue is empty — falling back to coverage mode')
+  }
+
+  const medicines = await loadCoverageMedicines(limit, offset, opts.staleDays, opts.all)
+  return { medicines, queueRowIds: [] }
 }
 
 async function main() {
-  const { limit, offset, slug, pharmacy, dryRun } = parseArgs()
+  const { limit, offset, slug, pharmacy, dryRun, queue, staleDays, all } = parseArgs()
 
   console.log('=== MedCompare Price Scraper ===')
   if (dryRun) console.log('DRY RUN — no DB writes')
+  if (queue) console.log('Mode: queue (draining pending scrape_queue)')
+  else if (all) console.log('Mode: all (ignoring stale filter)')
+  else console.log(`Mode: coverage (skipping prices fresher than ${staleDays}d)`)
   console.log()
 
-  const medicines = await loadMedicines(slug, limit, offset)
+  const { medicines, queueRowIds } = await loadMedicines(slug, limit, offset, { queue, staleDays, all })
   console.log(`Medicines to scrape: ${medicines.length}`)
-  if (pharmacy) console.log(`Pharmacy filter: ${pharmacy}`)
+  if (queueRowIds.length) console.log(`Queue items:         ${queueRowIds.length}`)
+  if (pharmacy) console.log(`Pharmacy filter:     ${pharmacy}`)
   console.log()
+
+  if (medicines.length === 0) {
+    console.log('Nothing to scrape — all medicines have fresh prices.')
+    return
+  }
 
   const browser = await chromium.launch({ headless: true })
   let totalPrices = 0
@@ -421,11 +506,16 @@ async function main() {
       const rows = await scrapeMedicine(browser, med, pharmacy, dryRun)
       const found = rows.filter(r => r.price !== null).length
       totalPrices += found
-      // Polite delay between medicines
       await new Promise(r => setTimeout(r, 1500 + Math.random() * 1000))
     }
   } finally {
     await browser.close()
+  }
+
+  // Mark queue items as done now that we've scraped them
+  if (!dryRun && queueRowIds.length) {
+    await markQueueDone(queueRowIds)
+    console.log(`\nMarked ${queueRowIds.length} queue item(s) as done.`)
   }
 
   console.log(`\n=== Done ===`)

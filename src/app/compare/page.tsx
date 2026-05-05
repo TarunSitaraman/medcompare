@@ -14,6 +14,8 @@ import type { Medicine, Price, Generic, Store } from '@/lib/supabase'
 import PriceCard from '@/components/PriceCard'
 import GenericAlert from '@/components/GenericAlert'
 import StoreLocator from '@/components/StoreLocator'
+import { isSaved, addSaved, removeSaved } from '@/lib/saved'
+import { isInCart, addToCart, removeFromCart } from '@/lib/cart'
 
 function cleanIngredient(s: string): string {
   return s.replace(/\s+(manufactured|marketed|m\s*\/?s|by)\b.*/i, '').trim()
@@ -65,6 +67,8 @@ function ComparePage() {
   const [loading, setLoading] = useState(true)
   const [notFound, setNotFound] = useState(false)
   const [queued, setQueued] = useState(false)
+  const [saved, setSaved] = useState(false)
+  const [inCart, setInCart] = useState(false)
   const storeLocatorRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -76,6 +80,8 @@ function ComparePage() {
     getMedicineBySlug(slug).then(async med => {
       if (!med) { setNotFound(true); setLoading(false); return }
       setMedicine(med)
+      setSaved(isSaved(med.id))
+      setInCart(isInCart(med.id))
 
       const [priceData, genericData, storeData] = await Promise.all([
         getPricesForMedicine(med.id),
@@ -123,6 +129,26 @@ function ComparePage() {
   const withPrices = prices.filter(p => p.price !== null)
   const minPrice = withPrices.length > 0 ? Math.min(...withPrices.map(p => p.price ?? Infinity)) : 0
 
+  function medicinePayload() {
+    return {
+      id: medicine!.id,
+      slug: medicine!.slug,
+      display_name: heading,
+      clean_salt: cleanSaltDisplay(medicine!.salt_name),
+      min_price: cheapestOnline,
+    }
+  }
+
+  function toggleSaved() {
+    if (saved) { removeSaved(medicine!.id); setSaved(false) }
+    else { addSaved(medicinePayload()); setSaved(true) }
+  }
+
+  function toggleCart() {
+    if (inCart) { removeFromCart(medicine!.id); setInCart(false) }
+    else { addToCart(medicinePayload()); setInCart(true) }
+  }
+
   return (
     <div className="page-enter">
       {/* AppNavbar */}
@@ -131,9 +157,28 @@ function ComparePage() {
           <button onClick={() => router.push('/')} style={{ width: 36, height: 36, borderRadius: 14, background: 'var(--bg-subtle)', border: '1px solid var(--border-strong)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-secondary)', cursor: 'pointer', flexShrink: 0 }}>
             <BackIcon />
           </button>
-          <span style={{ fontFamily: 'var(--font-heading)', fontSize: 16, fontWeight: 700, color: 'var(--text-primary)', letterSpacing: '-0.025em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          <span style={{ fontFamily: 'var(--font-heading)', fontSize: 16, fontWeight: 700, color: 'var(--text-primary)', letterSpacing: '-0.025em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
             {heading}
           </span>
+          <button
+            onClick={toggleSaved}
+            aria-label={saved ? 'Unsave medicine' : 'Save medicine'}
+            style={{ width: 36, height: 36, borderRadius: 14, background: saved ? 'var(--accent-surface)' : 'var(--bg-subtle)', border: `1px solid ${saved ? 'var(--accent-border)' : 'var(--border-strong)'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0, transition: 'all 0.2s ease' }}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill={saved ? 'var(--accent)' : 'none'} stroke={saved ? 'var(--accent)' : 'var(--text-secondary)'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+            </svg>
+          </button>
+          <button
+            onClick={toggleCart}
+            aria-label={inCart ? 'Remove from cart' : 'Add to cart'}
+            style={{ width: 36, height: 36, borderRadius: 14, background: inCart ? 'var(--gold-surface)' : 'var(--bg-subtle)', border: `1px solid ${inCart ? 'var(--gold-border)' : 'var(--border-strong)'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0, transition: 'all 0.2s ease' }}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill={inCart ? 'var(--gold)' : 'none'} stroke={inCart ? 'var(--gold)' : 'var(--text-secondary)'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+            </svg>
+          </button>
         </div>
       </div>
 

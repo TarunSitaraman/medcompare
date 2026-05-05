@@ -3,6 +3,7 @@ import { Plus_Jakarta_Sans, Inter } from 'next/font/google'
 import './globals.css'
 import ThemeToggle from '@/components/ThemeToggle'
 import AppInit from '@/components/AppInit'
+import CartBadge from '@/components/CartBadge'
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -94,7 +95,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               </div>
             </div>
           </div>
-          <ThemeToggle />
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <a href="/cart" style={{ position: 'relative', width: 40, height: 40, borderRadius: 14, background: 'rgba(255,255,255,0.13)', border: '1.5px solid rgba(255,255,255,0.22)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', textDecoration: 'none', flexShrink: 0 }} aria-label="Cart">
+              <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+              </svg>
+              <CartBadge />
+            </a>
+            <ThemeToggle />
+          </div>
         </header>
 
         <main className="page-enter">{children}</main>
@@ -152,12 +162,21 @@ function BottomNav() {
             icon: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
           },
           {
+            href: '/cart', label: 'Cart',
+            icon: (
+              <span style={{ position: 'relative' }}>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+                <CartBadge />
+              </span>
+            ),
+          },
+          {
             href: '/jan-aushadhi', label: 'Stores',
             icon: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
           },
         ].map(({ href, label, icon }) => (
           <a key={href} href={href}
-             className="flex flex-col items-center gap-1 px-5 py-1.5 rounded-xl relative"
+             className="flex flex-col items-center gap-1 px-4 py-1.5 rounded-xl relative"
              style={{ color: 'var(--text-muted)', textDecoration: 'none' }}>
             {icon}
             <span style={{ fontSize: 10, fontWeight: 500 }}>{label}</span>
