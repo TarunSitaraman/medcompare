@@ -44,6 +44,18 @@ const PHARMACY_LABELS: Record<string, string> = {
   '1mg': '1mg', pharmeasy: 'PharmEasy', apollo: 'Apollo', netmeds: 'Netmeds', medplus: 'MedPlus',
 }
 
+function pharmacySearchUrl(pharmacy: string, query: string): string {
+  const q = encodeURIComponent(query)
+  switch (pharmacy) {
+    case '1mg':      return `https://www.1mg.com/search/all?name=${q}&filter=true&type=medicine`
+    case 'pharmeasy': return `https://pharmeasy.in/search/all?name=${q}`
+    case 'apollo':   return `https://www.apollopharmacy.in/search-medicines/${q}`
+    case 'netmeds':  return `https://www.netmeds.com/catalogsearch/result?q=${q}`
+    case 'medplus':  return `https://www.medplusmart.com/search?query=${q}`
+    default:         return ''
+  }
+}
+
 const ShieldIcon = () => (
   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
@@ -300,21 +312,26 @@ function ComparePage() {
             </div>
           ) : (
             <div>
-              {withPrices.map((price, i) => (
-                <PriceCard
-                  key={price.id}
-                  pharmacy={price.pharmacy}
-                  pharmacyLabel={PHARMACY_LABELS[price.pharmacy] ?? price.pharmacy}
-                  price={price.price}
-                  url={price.url}
-                  inStock={price.in_stock}
-                  scrapedAt={price.scraped_at}
-                  isCheapest={i === 0}
-                  minPrice={minPrice}
-                  perUnit={price.price_per_unit ? `₹${price.price_per_unit}/unit` : null}
-                  nppaCeiling={medicine.nppa_ceiling ?? null}
-                />
-              ))}
+              {withPrices.map((price, i) => {
+                const searchQuery = medicine.brand_name ?? heading
+                const resolvedUrl = price.url ?? pharmacySearchUrl(price.pharmacy, searchQuery)
+                return (
+                  <PriceCard
+                    key={price.id}
+                    pharmacy={price.pharmacy}
+                    pharmacyLabel={PHARMACY_LABELS[price.pharmacy] ?? price.pharmacy}
+                    price={price.price}
+                    url={resolvedUrl}
+                    isDirectUrl={!!price.url}
+                    inStock={price.in_stock}
+                    scrapedAt={price.scraped_at}
+                    isCheapest={i === 0}
+                    minPrice={minPrice}
+                    perUnit={price.price_per_unit ? `₹${price.price_per_unit}/unit` : null}
+                    nppaCeiling={medicine.nppa_ceiling ?? null}
+                  />
+                )
+              })}
             </div>
           )}
         </section>

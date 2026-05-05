@@ -12,6 +12,7 @@ interface Props {
   price: number | null
   mrp?: number | null
   url: string | null
+  isDirectUrl?: boolean
   inStock: boolean
   scrapedAt: string
   isCheapest: boolean
@@ -21,7 +22,7 @@ interface Props {
   nppaCeiling?: number | null
 }
 
-export default function PriceCard({ pharmacy, pharmacyLabel, price, mrp, url, inStock, scrapedAt, isCheapest, minPrice, perUnit, cashback, nppaCeiling }: Props) {
+export default function PriceCard({ pharmacy, pharmacyLabel, price, mrp, url, isDirectUrl = false, inStock, scrapedAt, isCheapest, minPrice, perUnit, cashback, nppaCeiling }: Props) {
   const hoursAgo = Math.round((Date.now() - new Date(scrapedAt).getTime()) / 3600000)
   const isStale = hoursAgo > 12
   const cfg = PHARMACY_CONFIG[pharmacy] ?? { color: 'oklch(55% 0.05 240)', abbr: pharmacy.slice(0, 2).toUpperCase() }
@@ -140,7 +141,9 @@ export default function PriceCard({ pharmacy, pharmacyLabel, price, mrp, url, in
           {cashback ?? perUnit ?? ''}
         </div>
 
-        {url && inStock ? (
+        {!inStock ? (
+          <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Unavailable</span>
+        ) : url ? (
           <a href={url} target="_blank" rel="noopener noreferrer" style={{
             height: 34, padding: '0 14px',
             display: 'flex', alignItems: 'center', gap: 4,
@@ -156,10 +159,8 @@ export default function PriceCard({ pharmacy, pharmacyLabel, price, mrp, url, in
               color: 'var(--text-secondary)',
             }),
           }}>
-            {isCheapest ? 'Buy' : 'View'} →
+            {isDirectUrl ? (isCheapest ? 'Buy' : 'View') : 'Search'} →
           </a>
-        ) : !inStock ? (
-          <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Unavailable</span>
         ) : null}
       </div>
     </div>
