@@ -17,7 +17,7 @@ on:
 jobs:
   scrape:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 60
 
     steps:
       - uses: actions/checkout@v4
@@ -47,5 +47,5 @@ jobs:
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: |
           # Drain user-queued medicines first, then stale coverage
-          node scripts/scrape-prices.cjs --queue --limit 30
-          node scripts/scrape-prices.cjs --stale ${{ github.event.inputs.stale_days || '1' }} --limit 80
+          node scripts/scrape-prices.cjs --queue --limit 20
+          node scripts/scrape-prices.cjs --stale ${{ github.event.inputs.stale_days || '1' }} --limit 50
