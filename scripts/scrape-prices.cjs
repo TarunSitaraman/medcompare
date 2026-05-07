@@ -386,7 +386,7 @@ async function loadQueueMedicines(limit) {
     .from('scrape_queue')
     .select('id, medicine_id')
     .eq('status', 'pending')
-    .order('created_at')
+    .order('requested_at')
     .limit(limit)
 
   if (error) throw error
@@ -406,7 +406,7 @@ async function markQueueDone(queueRowIds) {
   if (!queueRowIds.length) return
   await supabase
     .from('scrape_queue')
-    .update({ status: 'done', updated_at: new Date().toISOString() })
+    .update({ status: 'done', processed_at: new Date().toISOString() })
     .in('id', queueRowIds)
 }
 
