@@ -47,5 +47,5 @@ jobs:
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: |
           # Drain user-queued medicines first, then stale coverage
-          node scripts/scrape-prices.cjs --queue --limit 20
-          node scripts/scrape-prices.cjs --stale ${{ github.event.inputs.stale_days || '1' }} --limit 50
+          node scripts/scrape-prices.cjs --queue --limit 10
+          node scripts/scrape-prices.cjs --stale ${{ github.event.inputs.stale_days || '1' }} --limit 30
