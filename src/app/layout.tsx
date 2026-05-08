@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from 'next'
 import { Plus_Jakarta_Sans, Inter } from 'next/font/google'
 import Link from 'next/link'
 import './globals.css'
-import ThemeToggle from '@/components/ThemeToggle'
 import AppInit from '@/components/AppInit'
 import CartBadge from '@/components/CartBadge'
 
@@ -93,7 +92,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               </svg>
               <CartBadge />
             </Link>
-            <ThemeToggle />
           </div>
         </header>
 
